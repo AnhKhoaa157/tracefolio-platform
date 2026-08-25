@@ -166,7 +166,7 @@ export default function Home() {
 
       <footer className="mx-auto flex max-w-7xl flex-col gap-5 border-t border-[#cbd2cc] px-6 py-8 text-sm text-[#87938a] sm:flex-row sm:items-center sm:justify-between lg:px-10">
         <p>Tracefolio — a living record of useful work.</p>
-        <a href="mailto:hello@tracefolio.local" className="text-[#526159] hover:text-[#17211d]">hello@tracefolio.local ↗</a>
+        <span className="text-[#526159]">Evidence, context, ownership.</span>
       </footer>
     </main>
   );
