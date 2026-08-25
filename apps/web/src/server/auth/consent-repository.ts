@@ -5,21 +5,16 @@ import { randomUUID } from "node:crypto";
 import { getDatabase } from "../db/client";
 import type { Database, DatabaseQuery } from "../db/types";
 import { consentInvalid, forbidden, notFound } from "../domain/errors";
+import { queryCurrentLegalDocuments } from "../legal/query";
+import type { LegalDocumentMetadata } from "../legal/types";
 import type {
   ConsentDocumentAcceptance,
   ConsentCompletionRecord,
   ConsentRepository,
-  LegalDocumentType,
 } from "./types";
 
 interface UserStatusRow {
   status: "ACTIVE" | "CONSENT_REQUIRED" | "PENDING_DELETION" | "SUSPENDED";
-}
-
-interface LegalDocumentRow {
-  id: string;
-  document_type: LegalDocumentType;
-  version: string;
 }
 
 export class PostgresConsentRepository implements ConsentRepository {
@@ -42,8 +37,9 @@ export class PostgresConsentRepository implements ConsentRepository {
         throw forbidden("This account cannot complete legal consent.");
       }
 
-      const termsDocument = await findCurrentDocument(connection, "TERMS_OF_SERVICE");
-      const privacyDocument = await findCurrentDocument(connection, "PRIVACY_POLICY");
+      const currentDocuments = await queryCurrentLegalDocuments(connection);
+      const termsDocument = currentDocuments.find((document) => document.documentType === "TERMS_OF_SERVICE");
+      const privacyDocument = currentDocuments.find((document) => document.documentType === "PRIVACY_POLICY");
       assertCurrentDocument(termsDocument, terms, "Terms of Service");
       assertCurrentDocument(privacyDocument, privacy, "Privacy Policy");
 
@@ -72,30 +68,16 @@ export function getConsentRepository(): ConsentRepository {
   return new PostgresConsentRepository(getDatabase());
 }
 
-async function findCurrentDocument(
-  connection: DatabaseQuery,
-  documentType: LegalDocumentType,
-): Promise<LegalDocumentRow | null> {
-  const result = await connection.query<LegalDocumentRow>(
-    `
-      SELECT id, document_type, version
-      FROM legal_documents
-      WHERE document_type = $1 AND published_at <= now()
-      ORDER BY published_at DESC, created_at DESC, id DESC
-      LIMIT 1
-    `,
-    [documentType],
-  );
-
-  return result.rows[0] ?? null;
-}
-
 function assertCurrentDocument(
-  current: LegalDocumentRow | null,
+  current: LegalDocumentMetadata | undefined,
   requested: ConsentDocumentAcceptance,
   label: string,
-): asserts current is LegalDocumentRow {
-  if (!current || current.id !== requested.documentId || current.version !== requested.version) {
+): asserts current is LegalDocumentMetadata {
+  if (
+    !current ||
+    current.documentId !== requested.documentId ||
+    current.version !== requested.version
+  ) {
     throw consentInvalid(`${label} document is missing, unpublished, or not current.`);
   }
 }

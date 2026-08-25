@@ -1,3 +1,7 @@
+import type { LegalDocumentType } from "@/contracts/legal";
+
+export type { LegalDocumentType } from "@/contracts/legal";
+
 export type AuthUserStatus =
   | "ACTIVE"
   | "CONSENT_REQUIRED"
@@ -12,8 +16,6 @@ export interface GitHubIdentity {
   email: string | null;
   emailVerified: boolean;
 }
-
-export type LegalDocumentType = "TERMS_OF_SERVICE" | "PRIVACY_POLICY";
 
 export interface ConsentDocumentAcceptance {
   documentId: string;
