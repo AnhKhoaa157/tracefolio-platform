@@ -32,6 +32,27 @@ pnpm db:seed:legal
 
 The runtime selects the latest `published_at` document per legal document type. Do not invent document IDs or versions in a client request.
 
+### Local development values
+
+The web app now serves the actual Terms and Privacy pages at `/legal/terms/2026-01` and
+`/legal/privacy/2026-01`. For a local `pnpm dev` run, seed with exactly these values so the served
+pages match the consented document metadata:
+
+```bash
+DATABASE_URL=postgresql://... \
+LEGAL_TERMS_DOCUMENT_ID=terms-2026-01 \
+LEGAL_TERMS_DOCUMENT_VERSION=2026-01 \
+LEGAL_TERMS_DOCUMENT_URL=http://localhost:3000/legal/terms/2026-01 \
+LEGAL_PRIVACY_DOCUMENT_ID=privacy-2026-01 \
+LEGAL_PRIVACY_DOCUMENT_VERSION=2026-01 \
+LEGAL_PRIVACY_DOCUMENT_URL=http://localhost:3000/legal/privacy/2026-01 \
+pnpm db:seed:legal
+```
+
+In production, replace `http://localhost:3000` with the deployed production origin, and have the
+legal copy itself reviewed (and the TODO items on those pages resolved) before pointing a real
+seed run at it.
+
 ## Runtime contract
 
 At deploy time, the Cloudflare runtime passes Hyperdrive's connection string to the data-access layer. Use `pg` behind repositories; UI and route handlers must not contain raw database connection logic.

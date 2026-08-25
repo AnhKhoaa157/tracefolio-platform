@@ -37,12 +37,20 @@ export default function Home() {
             <a href="#method" className="transition hover:text-[#17211d]">Method</a>
             <a href="#principles" className="transition hover:text-[#17211d]">Principles</a>
           </div>
-          <Link
-            href="/p/demo"
-            className="rounded-full border border-[#b7c0b9] px-4 py-2 text-sm font-medium transition hover:border-[#17211d] hover:bg-[#17211d] hover:text-[#f4f0e8]"
-          >
-            View a sample
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/p/demo"
+              className="rounded-full border border-[#b7c0b9] px-4 py-2 text-sm font-medium transition hover:border-[#17211d] hover:bg-[#17211d] hover:text-[#f4f0e8]"
+            >
+              View a sample
+            </Link>
+            <Link
+              href="/sign-in"
+              className="rounded-full bg-[#17211d] px-4 py-2 text-sm font-semibold text-[#f4f0e8] transition hover:-translate-y-0.5 hover:bg-[#2c3b33]"
+            >
+              Sign in
+            </Link>
+          </div>
         </nav>
 
         <div className="grid items-end gap-14 py-20 lg:grid-cols-[1.06fr_0.94fr] lg:py-28">
