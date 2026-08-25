@@ -63,7 +63,7 @@ export class PostgresAuthRepository implements AuthRepository {
       const displayName = identity.displayName?.trim() || identity.login;
 
       await connection.query(
-        `INSERT INTO users (id, display_name) VALUES ($1, $2)`,
+        `INSERT INTO users (id, status, display_name) VALUES ($1, 'CONSENT_REQUIRED', $2)`,
         [userId, displayName],
       );
       await connection.query(
