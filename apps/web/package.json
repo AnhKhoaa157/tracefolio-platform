@@ -7,14 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test src/server/domain/service.test.ts src/server/api/errors.test.ts"
   },
   "dependencies": {
     "next": "16.3.2",
+    "pg": "^8.16.3",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@types/pg": "^8.15.5",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -22,6 +26,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.2",
     "tailwindcss": "^4",
+    "tsx": "^4.20.0",
     "typescript": "^5"
   },
   "packageManager": "pnpm@11.19.0"
