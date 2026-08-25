@@ -13,6 +13,18 @@ export interface GitHubIdentity {
   emailVerified: boolean;
 }
 
+export type LegalDocumentType = "TERMS_OF_SERVICE" | "PRIVACY_POLICY";
+
+export interface ConsentDocumentAcceptance {
+  documentId: string;
+  version: string;
+}
+
+export interface ConsentCompletionRecord {
+  status: "ACTIVE";
+  documents: Array<ConsentDocumentAcceptance & { documentType: LegalDocumentType }>;
+}
+
 export interface AuthUserRecord {
   userId: string;
   status: AuthUserStatus;
@@ -34,4 +46,12 @@ export interface AuthRepository {
   findSessionByTokenHash(tokenHash: string): Promise<AuthUserRecord | null>;
   createSession(input: CreateSessionInput): Promise<void>;
   revokeSessionByTokenHash(tokenHash: string): Promise<void>;
+}
+
+export interface ConsentRepository {
+  completeConsent(
+    userId: string,
+    terms: ConsentDocumentAcceptance,
+    privacy: ConsentDocumentAcceptance,
+  ): Promise<ConsentCompletionRecord>;
 }
