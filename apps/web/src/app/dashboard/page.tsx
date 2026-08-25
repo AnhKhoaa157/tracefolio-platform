@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getTracefolioService } from "@/server/domain";
 
 import { DashboardNav } from "./_components/dashboard-nav";
+import { PortfolioVisibilityPanel } from "./_components/portfolio-visibility-panel";
 import { getCurrentUser } from "./_lib/current-user";
 
 export const metadata: Metadata = {
@@ -17,18 +18,21 @@ export default async function DashboardOverviewPage() {
   if (!user.onboardingComplete) redirect("/onboarding");
 
   const service = getTracefolioService();
-  const [profile, skills, achievements] = await Promise.all([
+  const [profile, skills, achievements, portfolioSettings] = await Promise.all([
     service.getProfile(user.userId),
     service.listSkills(user.userId),
     service.listAchievements(user.userId),
+    service.getPortfolioSettings(user.userId),
   ]);
 
   const draftAchievements = achievements.filter((achievement) => achievement.status === "DRAFT").slice(0, 5);
-  const portfolioHref = user.username ? `/p/${user.username}` : null;
+  const portfolioHref = portfolioSettings.isPublic ? portfolioSettings.publicUrl : null;
 
   return (
     <div className="space-y-10">
       <DashboardNav active="/dashboard" />
+
+      <PortfolioVisibilityPanel settings={portfolioSettings} />
 
       <section className="grid gap-4 sm:grid-cols-3">
         <SummaryCard
@@ -104,7 +108,7 @@ export default async function DashboardOverviewPage() {
             href="/dashboard/achievements"
           />
           {portfolioHref ? (
-            <ActionCard title="View portfolio" description="See your public page." href={portfolioHref} />
+            <ActionCard title="View public portfolio" description="See your public page." href={portfolioHref} />
           ) : null}
         </div>
       </section>

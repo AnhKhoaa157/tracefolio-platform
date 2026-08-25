@@ -3,6 +3,7 @@ import type {
   AchievementStatus,
   Profile,
   ProfileLink,
+  PortfolioSettings,
   PublicSkill,
   Skill,
 } from "@/contracts/portfolio";
@@ -124,5 +125,6 @@ export interface TracefolioRepository {
 
   publishPortfolio(userId: string, requestId: string): Promise<void>;
   unpublishPortfolio(userId: string, requestId: string): Promise<void>;
+  getPortfolioSettingsByUserId(userId: string): Promise<PortfolioSettings>;
   getPublicPortfolioByUsername(usernameNormalized: string): Promise<PublicPortfolioCandidate | null>;
 }

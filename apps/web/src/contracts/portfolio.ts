@@ -73,6 +73,11 @@ export interface PublicPortfolio {
   achievements: PublicAchievement[];
 }
 
+export interface PortfolioSettings {
+  isPublic: boolean;
+  publicUrl: string;
+}
+
 export interface CreateProfileRequest {
   username: string;
   headline?: string | null;
