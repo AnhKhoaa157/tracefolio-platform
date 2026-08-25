@@ -1,5 +1,6 @@
 import { DatabaseFailure } from "../db/errors";
 import { DomainError } from "../domain/errors";
+import { AuthFailure } from "../auth/errors";
 import type { ApiErrorBody } from "@/contracts/portfolio";
 
 export interface SafeApiError {
@@ -24,6 +25,10 @@ export function buildApiErrorBody(
 }
 
 export function toSafeApiError(error: unknown): SafeApiError {
+  if (error instanceof AuthFailure) {
+    return { code: error.code, message: error.message, status: error.status };
+  }
+
   if (error instanceof DomainError) {
     return { code: error.code, message: error.message, status: error.status };
   }
