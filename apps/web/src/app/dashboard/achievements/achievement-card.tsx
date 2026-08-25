@@ -4,9 +4,10 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 import type { Achievement, Skill, UpdateAchievementRequest } from "@/contracts/portfolio";
-import { apiRequest, getErrorMessage } from "@/lib/api-client";
+import { apiRequest, getErrorMessage, getMutationErrorMessage } from "@/lib/api-client";
 
-import { ErrorBanner, Field, inputClassName } from "../_components/field";
+import { ConfirmationDialog } from "../_components/confirmation-dialog";
+import { ErrorBanner, Field, inputClassName, SuccessBanner } from "../_components/field";
 
 interface AchievementCardProps {
   achievement: Achievement;
@@ -19,6 +20,12 @@ type LinkState =
   | { status: "idle" }
   | { status: "submitting" }
   | { status: "error"; message: string; failures: string[] };
+type VisibilityState =
+  | { status: "idle" }
+  | { status: "publishing" }
+  | { status: "unpublishing" }
+  | { status: "success"; message: string }
+  | { status: "error"; message: string };
 
 export function AchievementCard({ achievement, allSkills, defaultExpanded }: AchievementCardProps) {
   const router = useRouter();
@@ -37,9 +44,15 @@ export function AchievementCard({ achievement, allSkills, defaultExpanded }: Ach
   const linkedSkillIds = new Set(achievement.skills.map((skill) => skill.id));
   const [selectedSkillIds, setSelectedSkillIds] = useState<Set<string>>(new Set());
   const [linkState, setLinkState] = useState<LinkState>({ status: "idle" });
+  const [visibilityState, setVisibilityState] = useState<VisibilityState>({ status: "idle" });
+  const [publishDialogOpen, setPublishDialogOpen] = useState(false);
 
   const isEditSubmitting = editState.status === "submitting";
   const isLinking = linkState.status === "submitting";
+  const isVisibilitySubmitting =
+    visibilityState.status === "publishing" || visibilityState.status === "unpublishing";
+  const canPublish = achievement.status === "DRAFT" || achievement.status === "PRIVATE";
+  const hasLinkedSkills = achievement.skills.length > 0;
 
   function toggleSkillSelection(skillId: string) {
     setSelectedSkillIds((current) => {
@@ -111,6 +124,44 @@ export function AchievementCard({ achievement, allSkills, defaultExpanded }: Ach
       setLinkState({ status: "idle" });
     }
     router.refresh();
+  }
+
+  function openPublishConfirmation() {
+    if (!canPublish || !hasLinkedSkills || isVisibilitySubmitting) return;
+    setVisibilityState({ status: "idle" });
+    setPublishDialogOpen(true);
+  }
+
+  async function handlePublish() {
+    if (!canPublish || !hasLinkedSkills || isVisibilitySubmitting) return;
+
+    try {
+      setVisibilityState({ status: "publishing" });
+      await apiRequest<{ achievement: Achievement }>(`/api/achievements/${achievement.id}/publish`, {
+        method: "POST",
+      });
+      setPublishDialogOpen(false);
+      setVisibilityState({ status: "success", message: "Achievement published." });
+      router.refresh();
+    } catch (error) {
+      setPublishDialogOpen(false);
+      setVisibilityState({ status: "error", message: getMutationErrorMessage(error) });
+    }
+  }
+
+  async function handleUnpublish() {
+    if (achievement.status !== "PUBLIC" || isVisibilitySubmitting) return;
+
+    try {
+      setVisibilityState({ status: "unpublishing" });
+      await apiRequest<{ achievement: Achievement }>(`/api/achievements/${achievement.id}/unpublish`, {
+        method: "POST",
+      });
+      setVisibilityState({ status: "success", message: "Achievement unpublished and private again." });
+      router.refresh();
+    } catch (error) {
+      setVisibilityState({ status: "error", message: getMutationErrorMessage(error) });
+    }
   }
 
   return (
@@ -268,7 +319,38 @@ export function AchievementCard({ achievement, allSkills, defaultExpanded }: Ach
             >
               {linkerOpen ? "Hide Skill linker" : "Link Skills"}
             </button>
+            {canPublish ? (
+              <button
+                type="button"
+                onClick={openPublishConfirmation}
+                disabled={!hasLinkedSkills || isVisibilitySubmitting}
+                aria-busy={visibilityState.status === "publishing"}
+                aria-describedby={!hasLinkedSkills ? `publish-help-${achievement.id}` : undefined}
+                className="rounded-full bg-[#17211d] px-4 py-2 text-sm font-semibold text-[#f4f0e8] transition hover:bg-[#2c3b33] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {visibilityState.status === "publishing" ? "Publishing…" : "Publish"}
+              </button>
+            ) : null}
+            {achievement.status === "PUBLIC" ? (
+              <button
+                type="button"
+                onClick={handleUnpublish}
+                disabled={isVisibilitySubmitting}
+                aria-busy={visibilityState.status === "unpublishing"}
+                className="rounded-full border border-[#a24a34] px-4 py-2 text-sm font-semibold text-[#7a3b23] transition hover:bg-[#fbeae3] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {visibilityState.status === "unpublishing" ? "Unpublishing…" : "Unpublish"}
+              </button>
+            ) : null}
           </div>
+
+          {canPublish && !hasLinkedSkills ? (
+            <p id={`publish-help-${achievement.id}`} className="mt-3 text-sm text-[#7a3b23]">
+              Link at least one Skill before publishing this Achievement.
+            </p>
+          ) : null}
+          {visibilityState.status === "error" ? <ErrorBanner>{visibilityState.message}</ErrorBanner> : null}
+          {visibilityState.status === "success" ? <SuccessBanner>{visibilityState.message}</SuccessBanner> : null}
 
           {linkerOpen ? (
             <div className="mt-4 rounded-2xl border border-[#cbd2cc] bg-[#f4f0e8] p-4">
@@ -328,6 +410,21 @@ export function AchievementCard({ achievement, allSkills, defaultExpanded }: Ach
           ) : null}
         </>
       )}
+      <ConfirmationDialog
+        open={publishDialogOpen}
+        title="Publish this Achievement?"
+        description={
+          <>
+            <p>This Achievement will become visible on your public portfolio.</p>
+            <p className="mt-2">Anyone with the link can see its public-safe fields and linked Skill names.</p>
+          </>
+        }
+        confirmLabel="Publish Achievement"
+        confirmingLabel="Publishing…"
+        isConfirming={visibilityState.status === "publishing"}
+        onConfirm={handlePublish}
+        onCancel={() => setPublishDialogOpen(false)}
+      />
     </li>
   );
 }

@@ -28,8 +28,8 @@ export default async function DashboardAchievementsPage() {
       <div>
         <h1 className="text-3xl font-semibold tracking-[-0.05em] text-[#17211d]">Achievements</h1>
         <p className="mt-2 text-sm text-[#526159]">
-          New Achievements are always saved as private Drafts. Publishing isn&apos;t available yet in this
-          milestone.
+          New Achievements are always saved as private Drafts. Link at least one Skill before making an
+          Achievement public.
         </p>
       </div>
       <AchievementsWorkspace achievements={achievements} skills={skills} />

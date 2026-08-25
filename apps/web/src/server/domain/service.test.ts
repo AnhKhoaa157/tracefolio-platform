@@ -4,6 +4,7 @@ import test from "node:test";
 import type {
   Achievement,
   Profile,
+  PortfolioSettings,
   Skill,
 } from "@/contracts/portfolio";
 
@@ -80,6 +81,37 @@ test("public portfolio access remains unauthenticated and excludes non-public ac
 
   const portfolio = await service.getPublicPortfolio("owner");
   assert.deepEqual(portfolio?.achievements.map((achievement) => achievement.id), ["public"]);
+});
+
+test("private portfolio access returns no public portfolio", async () => {
+  const service = new TracefolioService(
+    repository({
+      getPublicPortfolioByUsername: async () => ({
+        profile: makeProfile(),
+        userStatus: "ACTIVE",
+        isPortfolioPublic: false,
+        achievements: [publicCandidate("public", "PUBLIC")],
+      }),
+    }),
+  );
+
+  assert.equal(await service.getPublicPortfolio("owner"), null);
+});
+
+test("portfolio settings are read for the authenticated user", async () => {
+  let receivedUserId = "";
+  const settings: PortfolioSettings = { isPublic: true, publicUrl: "/p/owner" };
+  const service = new TracefolioService(
+    repository({
+      getPortfolioSettingsByUserId: async (userId) => {
+        receivedUserId = userId;
+        return settings;
+      },
+    }),
+  );
+
+  assert.deepEqual(await service.getPortfolioSettings(ownerId), settings);
+  assert.equal(receivedUserId, ownerId);
 });
 
 test("unpublish does not require ACTIVE consent state", async () => {
@@ -180,6 +212,7 @@ function repository(overrides: Partial<TracefolioRepository>): TracefolioReposit
     unpublishAchievement: async () => makeAchievement({ userId: ownerId, status: "PRIVATE" }),
     publishPortfolio: async () => undefined,
     unpublishPortfolio: async () => undefined,
+    getPortfolioSettingsByUserId: async () => ({ isPublic: false, publicUrl: "/p/owner" }),
     getPublicPortfolioByUsername: async () => null,
   };
 

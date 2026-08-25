@@ -4,6 +4,7 @@ import type {
   CreateProfileRequest,
   CreateSkillRequest,
   Profile,
+  PortfolioSettings,
   PublicPortfolio,
   Skill,
   UpdateAchievementRequest,
@@ -289,6 +290,10 @@ export class TracefolioService {
     const userId = requireUserId(command.userId);
     // Deliberately no assertUserCanWrite: unpublish is always available in CONSENT_REQUIRED.
     await this.repository.unpublishPortfolio(userId, requestId(command.requestId));
+  }
+
+  async getPortfolioSettings(userId: string): Promise<PortfolioSettings> {
+    return this.repository.getPortfolioSettingsByUserId(requireUserId(userId));
   }
 
   async getPublicPortfolio(username: string): Promise<PublicPortfolio | null> {

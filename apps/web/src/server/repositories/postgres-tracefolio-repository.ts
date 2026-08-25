@@ -6,6 +6,7 @@ import type {
   Achievement,
   Profile,
   ProfileLink,
+  PortfolioSettings,
   PublicSkill,
   Skill,
 } from "@/contracts/portfolio";
@@ -75,6 +76,11 @@ interface PublicPortfolioRow {
   avatar_url: string | null;
   links_json: unknown;
   achievements_json: unknown;
+}
+
+interface PortfolioSettingsRow {
+  is_public: boolean;
+  username: string;
 }
 
 interface UserRow {
@@ -530,6 +536,25 @@ export class PostgresTracefolioRepository implements TracefolioRepository {
       );
       await writeAudit(connection, userId, "PORTFOLIO", userId, "PORTFOLIO_UNPUBLISHED", requestId);
     });
+  }
+
+  async getPortfolioSettingsByUserId(userId: string): Promise<PortfolioSettings> {
+    const result = await this.database.query<PortfolioSettingsRow>(
+      `
+        SELECT ps.is_public, p.username
+        FROM portfolio_settings ps
+        JOIN profiles p ON p.user_id = ps.user_id
+        WHERE ps.user_id = $1
+      `,
+      [userId],
+    );
+    const row = result.rows[0];
+    if (!row) throw notFound("The profile was not found.");
+
+    return {
+      isPublic: row.is_public,
+      publicUrl: `/p/${row.username}`,
+    };
   }
 
   async getPublicPortfolioByUsername(
