@@ -12,7 +12,7 @@ export async function POST(
   { params }: { params: Promise<{ achievementId: string }> },
 ): Promise<Response> {
   return handleApiRequest(request, async (requestId) => {
-    const userId = await requireAuthenticatedUserId();
+    const userId = await requireAuthenticatedUserId(request);
     const { achievementId } = await params;
     const achievement = await getTracefolioService().unpublishAchievement({
       userId,

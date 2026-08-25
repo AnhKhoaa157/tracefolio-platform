@@ -2,6 +2,7 @@ import "server-only";
 
 import { Pool, type PoolClient, type QueryResult, type QueryResultRow } from "pg";
 
+import { DomainError } from "../domain/errors";
 import { DatabaseFailure, normalizeDatabaseFailure } from "./errors";
 import type { Database, DatabaseQuery } from "./types";
 
@@ -81,7 +82,7 @@ function createDatabase(pool: Pool): Database {
           }
         }
 
-        if (error instanceof DatabaseFailure) throw error;
+        if (error instanceof DatabaseFailure || error instanceof DomainError) throw error;
         throw normalizeDatabaseFailure(error);
       } finally {
         client?.release();

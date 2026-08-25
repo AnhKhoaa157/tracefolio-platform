@@ -11,6 +11,7 @@
     "dev:agent": "pnpm --filter @tracefolio/agent-worker dev",
     "db:migrate": "pnpm --filter @tracefolio/database db:migrate",
     "db:check": "pnpm --filter @tracefolio/database db:check",
+    "db:seed:legal": "pnpm --filter @tracefolio/database db:seed-legal",
     "typecheck": "pnpm --filter @tracefolio/web typecheck && pnpm --filter @tracefolio/agent-contracts build && pnpm --filter @tracefolio/agent-worker typecheck",
     "test:web": "pnpm --filter @tracefolio/web test",
     "build:agent": "pnpm --filter @tracefolio/agent-contracts build && pnpm --filter @tracefolio/agent-worker build",

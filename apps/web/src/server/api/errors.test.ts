@@ -2,7 +2,7 @@ import { strict as assert } from "node:assert";
 import test from "node:test";
 
 import { DatabaseFailure } from "../db/errors";
-import { DomainError } from "../domain/errors";
+import { DomainError, legalDocumentsUnavailable } from "../domain/errors";
 import { buildApiErrorBody, toSafeApiError } from "./errors";
 
 test("API errors expose a stable code/message/status without internal details", () => {
@@ -30,6 +30,11 @@ test("API errors preserve safe domain codes and database failures stay generic",
   assert.deepEqual(toSafeApiError(new DatabaseFailure("DATABASE_UNAVAILABLE")), {
     code: "DATABASE_UNAVAILABLE",
     message: "The service is temporarily unavailable.",
+    status: 503,
+  });
+  assert.deepEqual(toSafeApiError(legalDocumentsUnavailable()), {
+    code: "LEGAL_DOCUMENTS_UNAVAILABLE",
+    message: "The required legal documents are temporarily unavailable.",
     status: 503,
   });
 });

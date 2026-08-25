@@ -7,7 +7,7 @@ import type {
   Skill,
 } from "@/contracts/portfolio";
 
-import { DomainError } from "./errors";
+import { consentRequired, DomainError } from "./errors";
 import type { PublicPortfolioCandidate, TracefolioRepository } from "./ports";
 import { TracefolioService } from "./service";
 
@@ -54,7 +54,7 @@ test("cross-owner Achievement and Skill links are rejected", async () => {
   );
 });
 
-test("public portfolio output excludes Draft, Private, and Archived achievements", async () => {
+test("public portfolio access remains unauthenticated and excludes non-public achievements", async () => {
   const candidate: PublicPortfolioCandidate = {
     profile: {
       userId: ownerId,
@@ -104,6 +104,38 @@ test("unpublish does not require ACTIVE consent state", async () => {
   });
   assert.equal(called, true);
   assert.equal(result.status, "PRIVATE");
+});
+
+test("consent-required users cannot write private portfolio data", async () => {
+  const service = new TracefolioService(
+    repository({
+      assertUserCanWrite: async () => {
+        throw consentRequired();
+      },
+    }),
+  );
+
+  await assert.rejects(
+    service.createSkill({ userId: ownerId, name: "Product thinking" }),
+    (error: unknown) => error instanceof DomainError && error.code === "CONSENT_REQUIRED",
+  );
+});
+
+test("portfolio unpublish remains available while consent is required", async () => {
+  let called = false;
+  const service = new TracefolioService(
+    repository({
+      assertUserCanWrite: async () => {
+        throw consentRequired();
+      },
+      unpublishPortfolio: async () => {
+        called = true;
+      },
+    }),
+  );
+
+  await service.unpublishPortfolio({ userId: ownerId });
+  assert.equal(called, true);
 });
 
 test("create command cannot select PUBLIC visibility", async () => {

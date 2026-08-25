@@ -1,6 +1,8 @@
 export type DomainErrorCode =
   | "CONFLICT"
   | "CONSENT_REQUIRED"
+  | "CONSENT_INVALID"
+  | "LEGAL_DOCUMENTS_UNAVAILABLE"
   | "FORBIDDEN"
   | "INVALID_INPUT"
   | "INVALID_STATE"
@@ -53,5 +55,19 @@ export function consentRequired(): DomainError {
     "CONSENT_REQUIRED",
     "Current legal consent is required before changing portfolio data.",
     403,
+  );
+}
+
+export function consentInvalid(
+  message = "The required legal documents are missing, unpublished, or not current.",
+): DomainError {
+  return new DomainError("CONSENT_INVALID", message, 409);
+}
+
+export function legalDocumentsUnavailable(): DomainError {
+  return new DomainError(
+    "LEGAL_DOCUMENTS_UNAVAILABLE",
+    "The required legal documents are temporarily unavailable.",
+    503,
   );
 }

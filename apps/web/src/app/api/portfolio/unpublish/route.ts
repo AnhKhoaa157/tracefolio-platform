@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest): Promise<Response> {
   return handleApiRequest(request, async (requestId) => {
-    const userId = await requireAuthenticatedUserId();
+    const userId = await requireAuthenticatedUserId(request);
     await getTracefolioService().unpublishPortfolio({ userId, requestId });
     return jsonResponse({ ok: true });
   });

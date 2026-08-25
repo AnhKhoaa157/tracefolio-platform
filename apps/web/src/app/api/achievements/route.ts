@@ -10,14 +10,14 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest): Promise<Response> {
   return handleApiRequest(request, async () => {
-    const userId = await requireAuthenticatedUserId();
+    const userId = await requireAuthenticatedUserId(request);
     return jsonResponse({ achievements: await getTracefolioService().listAchievements(userId) });
   });
 }
 
 export async function POST(request: NextRequest): Promise<Response> {
   return handleApiRequest(request, async (requestId) => {
-    const userId = await requireAuthenticatedUserId();
+    const userId = await requireAuthenticatedUserId(request);
     const body = (await readJsonObject(request)) as unknown as CreateAchievementRequest;
     const achievement = await getTracefolioService().createAchievement({
       ...body,

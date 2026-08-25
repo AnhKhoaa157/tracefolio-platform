@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test src/server/domain/service.test.ts src/server/api/errors.test.ts"
+    "test": "tsx --test src/server/domain/service.test.ts src/server/api/errors.test.ts src/server/auth/config.test.ts src/server/auth/state.test.ts src/server/auth/session.test.ts src/server/auth/github.test.ts src/server/auth/service.test.ts src/server/auth/consent.test.ts src/server/auth/routes.test.ts src/server/legal/query.test.ts src/server/legal/service.test.ts"
   },
   "dependencies": {
     "next": "16.3.2",

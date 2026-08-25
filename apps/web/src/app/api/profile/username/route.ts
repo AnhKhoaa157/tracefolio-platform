@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export async function PATCH(request: NextRequest): Promise<Response> {
   return handleApiRequest(request, async (requestId) => {
-    const userId = await requireAuthenticatedUserId();
+    const userId = await requireAuthenticatedUserId(request);
     const body = (await readJsonObject(request)) as unknown as ChangeUsernameRequest;
     const profile = await getTracefolioService().changeUsername({ ...body, userId, requestId });
     return jsonResponse({ profile });

@@ -13,7 +13,7 @@ export async function PATCH(
   { params }: { params: Promise<{ skillId: string }> },
 ): Promise<Response> {
   return handleApiRequest(request, async (requestId) => {
-    const userId = await requireAuthenticatedUserId();
+    const userId = await requireAuthenticatedUserId(request);
     const { skillId } = await params;
     const body = (await readJsonObject(request)) as unknown as UpdateSkillRequest;
     const skill = await getTracefolioService().updateSkill({ ...body, userId, skillId, requestId });
