@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { PortfolioSettings } from "@/contracts/portfolio";
 import { apiRequest, getMutationErrorMessage } from "@/lib/api-client";
@@ -27,8 +27,17 @@ export function PortfolioVisibilityPanel({ settings }: PortfolioVisibilityPanelP
   const [actionState, setActionState] = useState<ActionState>({ status: "idle" });
   const [publishDialogOpen, setPublishDialogOpen] = useState(false);
   const [copyState, setCopyState] = useState<CopyState>("idle");
+  const [absolutePublicUrl, setAbsolutePublicUrl] = useState<string | null>(null);
 
   const isSubmitting = actionState.status === "publishing" || actionState.status === "unpublishing";
+
+  useEffect(() => {
+    const frameId = window.requestAnimationFrame(() => {
+      setAbsolutePublicUrl(new URL(settings.publicUrl, window.location.origin).toString());
+    });
+
+    return () => window.cancelAnimationFrame(frameId);
+  }, [settings.publicUrl]);
 
   function openPublishConfirmation() {
     if (settings.isPublic || isSubmitting) return;
@@ -66,7 +75,8 @@ export function PortfolioVisibilityPanel({ settings }: PortfolioVisibilityPanelP
 
   async function handleCopyUrl() {
     try {
-      await navigator.clipboard.writeText(settings.publicUrl);
+      const publicUrl = new URL(settings.publicUrl, window.location.origin).toString();
+      await navigator.clipboard.writeText(publicUrl);
       setCopyState("copied");
     } catch {
       setCopyState("error");
@@ -109,9 +119,11 @@ export function PortfolioVisibilityPanel({ settings }: PortfolioVisibilityPanelP
           <div className="mt-2 flex flex-col gap-3 sm:flex-row">
             <input
               id="public-portfolio-url"
-              value={settings.publicUrl}
+              value={absolutePublicUrl ?? ""}
               readOnly
               aria-label="Public portfolio URL"
+              aria-busy={absolutePublicUrl === null}
+              placeholder={absolutePublicUrl === null ? "Preparing shareable URL…" : undefined}
               className="min-w-0 flex-1 rounded-2xl border border-[#b7c0b9] bg-white/70 px-4 py-3 text-sm text-[#17211d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#17211d]"
             />
             <button
