@@ -37,12 +37,12 @@ export default function Home() {
             <a href="#method" className="transition hover:text-[#17211d]">Method</a>
             <a href="#principles" className="transition hover:text-[#17211d]">Principles</a>
           </div>
-          <a
+          <Link
             href="/p/demo"
             className="rounded-full border border-[#b7c0b9] px-4 py-2 text-sm font-medium transition hover:border-[#17211d] hover:bg-[#17211d] hover:text-[#f4f0e8]"
           >
             View a sample
-          </a>
+          </Link>
         </nav>
 
         <div className="grid items-end gap-14 py-20 lg:grid-cols-[1.06fr_0.94fr] lg:py-28">
@@ -60,12 +60,12 @@ export default function Home() {
               supporting files, and the skills that made the work possible.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-4">
-              <a
+              <Link
                 href="/p/demo"
                 className="rounded-full bg-[#17211d] px-6 py-3.5 text-sm font-semibold text-[#f4f0e8] transition hover:-translate-y-0.5 hover:bg-[#2c3b33]"
               >
                 Explore the product <span aria-hidden="true">↗</span>
-              </a>
+              </Link>
               <a href="#method" className="px-2 py-3.5 text-sm font-semibold text-[#526159] transition hover:text-[#17211d]">
                 See how it works <span aria-hidden="true">↓</span>
               </a>
