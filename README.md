@@ -4,12 +4,15 @@ Tracefolio turns real work into structured achievements, skill evidence, and sha
 
 The repository is a pnpm monorepo with a Next.js web app, an isolated agent worker, shared agent contracts, and a local DeepSeek Harness checkout. Claude Code and Codex compatibility belongs in the worker/plugin layer; the product web app remains independent from the agent runtime.
 
+The production persistence decision is PostgreSQL hosted outside Cloudflare and accessed from the Cloudflare web runtime through Hyperdrive. Cloudflare R2 is reserved for attachment objects. `packages/database` contains the PostgreSQL-native migration contract; D1 is not in the product data path.
+
 ## Repository layout
 
 ```text
 apps/web/                  Next.js product application
 apps/agent-worker/         Isolated agent runtime entry point
 packages/agent-contracts/  Provider-neutral agent contracts
+packages/database/         PostgreSQL migrations and data-access boundary
 vendor/deepseek-harness/   Local, ignored upstream Harness checkout
 ```
 
