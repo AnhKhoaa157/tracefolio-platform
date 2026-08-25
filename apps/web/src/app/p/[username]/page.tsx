@@ -63,14 +63,14 @@ export default async function PublicPortfolioPage({ params }: PublicPortfolioPag
       </header>
 
       <section className="py-14">
-        <div className="mb-8 flex items-end justify-between">
-          <div>
+        <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-6">
+          <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#87938a]">Selected evidence</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-[#17211d]">
               What changed because I was there.
             </h2>
           </div>
-          <span className="hidden text-sm text-[#87938a] sm:block">
+          <span className="shrink-0 whitespace-nowrap text-sm text-[#87938a]">
             {achievements.length} {achievements.length === 1 ? "outcome" : "outcomes"}
           </span>
         </div>
