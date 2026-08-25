@@ -15,6 +15,23 @@ DATABASE_URL=postgresql://... pnpm db:check
 
 The runner records successfully applied files in `schema_migrations` and executes each new migration in one transaction.
 
+## Legal document bootstrap
+
+Consent completion requires one current, published Terms of Service document and one current, published Privacy Policy document. Seed explicit document metadata after migrations; the bootstrap is idempotent for matching IDs and refuses metadata conflicts.
+
+```bash
+DATABASE_URL=postgresql://... \
+LEGAL_TERMS_DOCUMENT_ID=terms-2026-01 \
+LEGAL_TERMS_DOCUMENT_VERSION=2026-01 \
+LEGAL_TERMS_DOCUMENT_URL=https://example.test/legal/terms/2026-01 \
+LEGAL_PRIVACY_DOCUMENT_ID=privacy-2026-01 \
+LEGAL_PRIVACY_DOCUMENT_VERSION=2026-01 \
+LEGAL_PRIVACY_DOCUMENT_URL=https://example.test/legal/privacy/2026-01 \
+pnpm db:seed:legal
+```
+
+The runtime selects the latest `published_at` document per legal document type. Do not invent document IDs or versions in a client request.
+
 ## Runtime contract
 
 At deploy time, the Cloudflare runtime passes Hyperdrive's connection string to the data-access layer. Use `pg` behind repositories; UI and route handlers must not contain raw database connection logic.
