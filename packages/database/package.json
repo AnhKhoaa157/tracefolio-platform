@@ -1,0 +1,12 @@
+{
+  "name": "@tracefolio/database",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "db:migrate": "node ./scripts/migrate.mjs",
+    "db:check": "node ./scripts/check.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.16.3"
+  }
+}
