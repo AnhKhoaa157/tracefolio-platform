@@ -1,0 +1,16 @@
+{
+  "name": "tracefolio-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Evidence-first career portfolio platform with a pluggable agent runtime.",
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "dev:web": "pnpm --filter @tracefolio/web dev",
+    "build:web": "pnpm --filter @tracefolio/web build",
+    "lint:web": "pnpm --filter @tracefolio/web lint",
+    "dev:agent": "pnpm --filter @tracefolio/agent-worker dev",
+    "typecheck": "pnpm --filter @tracefolio/agent-contracts build && pnpm --filter @tracefolio/agent-worker typecheck",
+    "build:agent": "pnpm --filter @tracefolio/agent-contracts build && pnpm --filter @tracefolio/agent-worker build",
+    "harness:build": "pnpm --dir vendor/deepseek-harness build"
+  }
+}

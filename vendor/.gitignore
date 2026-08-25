@@ -1,0 +1,3 @@
+# DeepSeek Harness is a local, pinned external dependency.
+# See docs/UPSTREAM_HARNESS.md for provenance and the refresh procedure.
+deepseek-harness/

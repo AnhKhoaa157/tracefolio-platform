@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+**/node_modules/
+.pnpm-store/
+
+# Build output
+.next/
+out/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+!.env.local.example
+*.local
+.credentials.yaml
+
+# Runtime state
+.dsh/
+.tracefolio/
+*.log
+pnpm-debug.log*
+
+# Tool caches
+.turbo/
+.vite/
+.eslintcache
+
+# Local project documentation; keep available locally but do not commit.
+docs/
+
+# Local AI skills, Claude plugins, and per-developer instructions.
+.agents/
+.claude/
+
+# Harness is downloaded locally from the pinned upstream revision.
+# It is intentionally not committed to the Tracefolio repository.
+vendor/deepseek-harness/
+
+# Harness-local generated state
+vendor/deepseek-harness/node_modules/
+vendor/deepseek-harness/.dsh/
+vendor/deepseek-harness/.env
